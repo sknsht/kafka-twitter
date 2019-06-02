@@ -1,4 +1,4 @@
-package com.skinsht.kafka.elasticsearch;
+package com.sknsht.kafka.elasticsearch;
 
 import com.google.gson.JsonParser;
 import org.apache.http.HttpHost;
