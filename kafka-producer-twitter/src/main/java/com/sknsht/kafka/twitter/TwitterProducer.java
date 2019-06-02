@@ -23,16 +23,16 @@ import java.util.concurrent.TimeUnit;
 
 public class TwitterProducer {
 
-    Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(TwitterProducer.class.getName());
 
     private static final String CONSUMER_KEY = "";
     private static final String CONSUMER_SECRET = "";
     private static final String TOKEN = "";
     private static final String TOKEN_SECRET = "";
 
-    public static final String TOPIC_NAME = "twitter_tweets";
+    private static final String TOPIC_NAME = "twitter_tweets";
 
-    List<String> terms = Lists.newArrayList("kafka");
+    private static List<String> terms = Lists.newArrayList("kafka");
 
 
     public TwitterProducer() {
@@ -43,7 +43,7 @@ public class TwitterProducer {
     }
 
     public void run() {
-        logger.info("Setup");
+        log.info("Setup");
 
         // Be sure to size these properly based on expected TPS of your stream
         BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>(1000);
@@ -56,14 +56,14 @@ public class TwitterProducer {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             client.stop();
             producer.close();
-            logger.info("Shutdown");
+            log.info("Shutdown");
         }));
 
         sendTweets(msgQueue, client, producer);
-        logger.info("End of application");
+        log.info("End of application");
     }
 
-    private Client createTwitterClient(BlockingQueue<String> msgQueue) {
+    private static Client createTwitterClient(BlockingQueue<String> msgQueue) {
         // Declaring the connection information
         Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
         StatusesFilterEndpoint hosebirdEndpoint = new StatusesFilterEndpoint();
@@ -84,7 +84,7 @@ public class TwitterProducer {
         return hosebirdClient;
     }
 
-    private KafkaProducer<String, String> createKafkaProducer() {
+    private static KafkaProducer<String, String> createKafkaProducer() {
         String bootstrapServers = "127.0.0.1:9092";
 
         // Create Producer properties
@@ -118,10 +118,10 @@ public class TwitterProducer {
                 client.stop();
             }
             if (msg != null) {
-                logger.info(msg);
+                log.info(msg);
                 producer.send(new ProducerRecord<>(TOPIC_NAME, null, msg), (recordMetadata, e) -> {
                     if (e != null) {
-                        logger.error("Something bad happened", e);
+                        log.error("Something bad happened", e);
                     }
                 });
             }
