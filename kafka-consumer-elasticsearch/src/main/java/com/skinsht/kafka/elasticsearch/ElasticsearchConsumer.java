@@ -1,5 +1,6 @@
 package com.skinsht.kafka.elasticsearch;
 
+import com.google.gson.JsonParser;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -44,10 +45,13 @@ public class ElasticsearchConsumer {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
 
             for (ConsumerRecord<String, String> record : records) {
+                String id = extractIdFromTweet(record.value());
+
                 // Where we insert data into ElasticSearch
                 IndexRequest indexRequest = new IndexRequest(
                         "twitter",
-                        "tweets"
+                        "tweets",
+                        id
                 ).source(record.value(), XContentType.JSON);
 
                 IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
@@ -89,5 +93,15 @@ public class ElasticsearchConsumer {
         consumer.subscribe(Arrays.asList(topic));
 
         return consumer;
+    }
+
+    private static String extractIdFromTweet(String tweetJson) {
+        // 2 strategies:
+        // kafka generic ID
+        // record.topic() + "_" + record.partition() + "_" + record.offset()
+        return new JsonParser().parse(tweetJson)
+                .getAsJsonObject()
+                .get("id_str")
+                .getAsString();
     }
 }
