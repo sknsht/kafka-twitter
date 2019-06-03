@@ -15,3 +15,7 @@ The ElasticSearch Consumer gets data from twitter topic and inserts it into Elas
 * ElasticSearch setup:
   - https://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html
   - OR https://bonsai.io/
+
+## Kafka Streams Filter Tweets
+
+A simple illustration of the use of Kafka Streams on the example of filtering tweets by number of followers
